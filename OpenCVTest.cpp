@@ -6,23 +6,83 @@
 
 #include <windows.h>
 
+
 /** @function main */
-int main(int argc, const char** argv)
+int main(int argc, char** argv)
 {
 
+	/*
+	
+	HELP: 
+	openCV.exe -w <Webcam-number> -i <image> -c <Cascade> -a <algorithm(HAAR, LBP) -l <amount of runs on image>
+
+	*/
+
+	bool test;
+	int numberOfTests = 10;
+
+	if (argc < 0) {
+		std::cerr << "Error, the program needs at least 2 parameters, with value.\n"
+			<< "The input should look like:\n \"openCV.exe -w <Webcam-number> -i <image> -c <Cascade> -a <algorithm(HAAR, LBP)>\"";
+		return -1;
+	}
+
+	if (std::string(argv[1]) == "-w") {
+		webcam = argv[2];
+		test = false;
+	}
+	else if (std::string(argv[1]) == "-i") {
+		image = argv[2];
+		test = true;
+	}
+	else {
+		std::cerr << "Error, chose either the webcamera or a image.\n you chose: " << argv[1] << std::endl;
+		return -1;
+	}
+
+
+	if (std::string(argv[3]) == "-c") {
+		cascadeName = argv[4];
+	}
+	else {
+		std::cerr << "Error, enter a directory to the cascade.\n";
+		return -1;
+	}
+
+
+	if (std::string(argv[5]) == "-a") {
+		if (std::string(argv[6]) == "HAAR") {
+			algorithm = HAAR;
+		}
+		else if (std::string(argv[6]) == "LBP") {
+			algorithm = LBP;
+		}
+	}
+
+	if (std::string(argv[7]) == "-l") {
+		numberOfTests = std::stoi(argv[8]);
+	}
+
 	//Load the cascades
-	if (!face_cascade_haar.load(face_cascade_name_haar)) {
+	if (!cascade.load(cascadeName)) {
 		printf("--(!)Error loading HAAR cascade\n");
 		return -1;
 	}
 
-	if (!face_cascade_lbp.load(face_cascade_name_lbp)) {
-		printf("--(!)Error loading LBP cascade\n");
-		return -1;
+	if (test) {
+		testSpeed(algorithm, numberOfTests);
 	}
+	else {
+		captureVideo(algorithm);
+	}
+
+	//Run the tests
+	//testSpeed(LBP, 5);
+	//testSpeed(algorithm);
+/*
 	captureVideo(HAAR);
 	captureVideo(LBP);
-
+*/
 
 
 	//cv::Mat frame = cv::imread(image, CV_LOAD_IMAGE_COLOR);
@@ -35,6 +95,10 @@ int main(int argc, const char** argv)
 
 	return 0;
 }
+
+
+
+
 
 
 	/*
